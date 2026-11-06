@@ -1,0 +1,3 @@
+/* npcart.js — 由 _mkart.js 自动生成（WZ Npc/1001100 米娜 杂货商人） */
+window.WZ=window.WZ||{};
+window.WZ.npc={"merchant":{"id":"1001100","name":"米娜","func":"杂货商人","speak":["便宜了！便宜了！","喂！小家伙！别想偷东西啊~","要探险可要多准备药水啊！"],"anims":{"stand":[{"s":"assets/npc/merchant/stand_0.png","w":59,"h":69,"ox":27,"oy":69,"d":1200},{"s":"assets/npc/merchant/stand_1.png","w":59,"h":69,"ox":27,"oy":69,"d":100},{"s":"assets/npc/merchant/stand_2.png","w":59,"h":69,"ox":27,"oy":69,"d":150}],"smile":[{"s":"assets/npc/merchant/smile_0.png","w":59,"h":69,"ox":27,"oy":69,"d":5000}],"arm":[{"s":"assets/npc/merchant/arm_0.png","w":59,"h":69,"ox":27,"oy":69,"d":5000}]}}};
