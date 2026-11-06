@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+  <link rel="icon" href="data:,">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>海龙土豆镇 · Brotato-like</title>
+<link rel="stylesheet" href="css/style.css?v=42">
+</head>
+<body>
+<!-- 竖屏提示：触屏设备强制引导横屏 -->
+<div id="rotate-hint" class="rotate-hint" aria-hidden="true">
+  <div class="rotate-box">
+    <div class="rotate-phone"><span></span></div>
+    <h2>请横屏游玩</h2>
+    <p>横屏后可使用全部技能按键与完整视野</p>
+    <button class="btn primary" id="btn-rotate-full">进入全屏横屏</button>
+  </div>
+</div>
+
+<div id="app">
+  <!-- 登录画面 -->
+  <section id="screen-login" class="screen active">
+    <div class="login-bg"></div>
+    <div class="login-veil"></div>
+    <div class="login-panel">
+      <div class="login-kicker">SEA DRAGON POTATO · ONLINE</div>
+      <h1 class="game-title">海龙<span>土豆镇</span></h1>
+      <p class="login-sub">2D ROGUE SURVIVOR · 18 角色 · 6 场景 · 30 波</p>
+      <button class="btn primary login-btn" data-action="login">进入游戏</button>
+      <div class="login-note">无需账号 · 本地存档 · 支持手机 / PC / 联机</div>
+    </div>
+  </section>
+
+  <!-- 标题画面 -->
+  <section id="screen-title" class="screen">
+    <div class="title-bg"></div>
+    <div class="title-inner">
+      <h1 class="game-title">海龙<span>土豆镇</span></h1>
+      <p class="subtitle">SEA DRAGON POTATO · 2D ROGUE SURVIVOR</p>
+      <div class="menu">
+        <button class="btn primary" data-action="start">开始游戏</button>
+        <button class="btn" data-action="online">联机合作</button>
+        <button class="btn" data-action="daily">每日挑战</button>
+        <button class="btn" data-action="talent">永久天赋</button>
+        <button class="btn" data-action="codex">图鉴 / 玩法</button>
+        <button class="btn" data-action="settings">设置</button>
+      </div>
+      <div class="save-line" id="save-line"></div>
+      <div class="hint">WASD 移动 · 鼠标瞄准 · 空格冲刺 · 1~4 技能 · ESC 暂停</div>
+    </div>
+  </section>
+
+  <!-- 角色选择 -->
+  <section id="screen-char" class="screen">
+    <header class="topbar">
+      <button class="btn ghost" data-action="back-title">← 返回</button>
+      <h2>选择角色</h2>
+      <div class="gold" id="char-gold"></div>
+    </header>
+    <div class="char-wrap">
+      <div class="char-list" id="char-list"></div>
+      <aside class="char-detail" id="char-detail"></aside>
+    </div>
+    <footer class="bottombar">
+      <button class="btn ghost" id="btn-char-settings">⚙ 设置</button>
+      <button class="btn primary" id="btn-to-map">下一步：选择场景 →</button>
+    </footer>
+  </section>
+
+  <!-- 场景选择 -->
+  <section id="screen-map" class="screen">
+    <header class="topbar">
+      <button class="btn ghost" data-action="back-char">← 返回</button>
+      <h2>选择场景</h2>
+      <div class="gold" id="map-gold"></div>
+    </header>
+    <div class="diff-panel">
+      <div class="diff-head"><span class="diff-title">难度模式</span><span class="diff-summary" id="diff-summary"></span></div>
+      <div class="diff-grid" id="difficulty-list"></div>
+    </div>
+    <div class="map-list" id="map-list"></div>
+    <footer class="bottombar">
+      <label class="chk"><input type="checkbox" id="opt-endless"> 无尽模式（30 波后继续）</label>
+      <button class="btn primary" id="btn-start-run">出发！</button>
+    </footer>
+  </section>
+
+  <!-- 游戏 -->
+  <section id="screen-game" class="screen">
+    <canvas id="game"></canvas>
+    <div id="hud">
+      <div class="hud-top">
+        <div class="hud-left">
+          <div class="hpbar"><div class="hpfill" id="hp-fill"></div><span id="hp-text">100/100</span></div>
+          <div class="xpbar"><div class="xpfill" id="xp-fill"></div><span id="xp-text">Lv.1</span></div>
+        </div>
+        <div class="hud-mid">
+          <div class="wave-tag"><span id="wave-label">第 1 波</span><span id="wave-timer">30</span></div>
+          <div class="wave-progress"><div id="wave-progress-fill"></div></div>
+        </div>
+        <div class="hud-right">
+          <div class="stat-pill"><i class="ico-gold"></i><span id="gold-text">0</span></div>
+          <div class="stat-pill"><i class="ico-kill"></i><span id="kill-text">0</span></div>
+          <button class="btn ghost small touchonly" id="btn-dash">冲刺</button>
+          <button class="btn ghost small" id="btn-pause">II</button>
+        </div>
+      </div>
+      <div class="hud-bottom">
+        <div class="bond-bar" id="bond-bar"></div>
+        <div class="relic-slots" id="relic-slots"></div>
+        <div class="weapon-slots" id="weapon-slots"></div>
+        <div class="skill-slots" id="skill-slots"></div>
+      </div>
+      <button class="btn primary" id="btn-interact" aria-label="交易"><span class="k">E</span><span class="t">交易</span></button>
+      <div id="touch-stick" aria-hidden="true"><div class="stick-ring"><div class="stick-knob"></div></div></div>
+      <div id="toast-wrap"></div>
+      <div id="boss-bar" class="hidden"><div class="boss-name" id="boss-name"></div><div class="boss-hp"><div id="boss-hp-fill"></div></div></div>
+    </div>
+
+    <!-- 升级选卡 -->
+    <div id="overlay-levelup" class="overlay hidden">
+      <div class="overlay-inner">
+        <h3 class="ov-title">等级提升！<small>三选一</small></h3>
+        <div class="cards" id="levelup-cards"></div>
+        <div class="ov-foot"><button class="btn ghost" id="btn-reroll-levelup">重掷 (10 金币)</button></div>
+      </div>
+    </div>
+
+    <!-- 商店 -->
+    <div id="overlay-shop" class="overlay hidden">
+      <div class="overlay-inner wide">
+        <h3 class="ov-title">波次结束 · 商店<small id="shop-sub"></small></h3>
+        <div class="shop-grid" id="shop-items"></div>
+        <div class="shop-actions">
+          <button class="btn ghost" id="btn-reroll-shop">刷新 (8 金币)</button>
+          <button class="btn primary" id="btn-next-wave">下一波 →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 暂停 -->
+    <div id="overlay-pause" class="overlay hidden">
+      <div class="overlay-inner narrow">
+        <h3 class="ov-title">暂停</h3>
+        <div class="pause-stats" id="pause-stats"></div>
+        <div class="menu">
+          <button class="btn primary" id="btn-resume">继续</button>
+          <button class="btn" id="btn-pause-settings">⚙ 设置（皮肤 / 音效 / 画质）</button>
+          <button class="btn" id="btn-quit">放弃本局</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 结算 -->
+    <div id="overlay-result" class="overlay hidden">
+      <div class="overlay-inner narrow">
+        <h3 class="ov-title" id="result-title">阵亡</h3>
+        <div class="result-stats" id="result-stats"></div>
+        <div class="menu">
+          <button class="btn primary" id="btn-again">再来一局</button>
+          <button class="btn" id="btn-endless" style="display:none">继续无尽 →</button>
+          <button class="btn" id="btn-home">返回标题</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 图鉴 -->
+  <section id="screen-codex" class="screen">
+    <header class="topbar">
+      <button class="btn ghost" id="btn-codex-back">← 返回</button>
+      <h2>图鉴 / 玩法</h2>
+      <div class="tabs" id="codex-tabs">
+        <button class="tab active" data-tab="howto">玩法</button>
+        <button class="tab" data-tab="weapons">武器</button>
+        <button class="tab" data-tab="skills">技能</button>
+        <button class="tab" data-tab="cards">卡牌</button>
+        <button class="tab" data-tab="relics">遗物 / 羁绊</button>
+        <button class="tab" data-tab="talents">天赋</button>
+        <button class="tab" data-tab="ach">成就</button>
+        <button class="tab" data-tab="skin">伤害皮肤</button>
+        <button class="tab" data-tab="charskin">角色皮肤</button>
+        <button class="tab" data-tab="mobs">怪物</button>
+      </div>
+    </header>
+    <div class="codex-body" id="codex-body"></div>
+  </section>
+
+  <!-- 永久天赋 -->
+  <section id="screen-talent" class="screen">
+    <header class="topbar">
+      <button class="btn ghost" data-action="back-title">← 返回</button>
+      <h2>永久天赋</h2>
+      <div class="gold" id="talent-bank"></div>
+    </header>
+    <div class="talent-body" id="talent-body"></div>
+  </section>
+
+  <!-- 设置 -->
+  <section id="screen-settings" class="screen">
+    <header class="topbar">
+      <button class="btn ghost" id="btn-settings-back">← 返回</button>
+      <h2>设置</h2>
+    </header>
+    <div class="settings-body">
+      <label class="row"><span>音效音量</span><input type="range" id="opt-volume" min="0" max="100" value="60"></label>
+      <label class="row"><span>背景音乐</span><input type="range" id="opt-bgm" min="0" max="100" value="45"></label>
+      <label class="row"><span>屏幕震动</span><input type="checkbox" id="opt-shake" checked></label>
+      <label class="row"><span>伤害数字</span><input type="checkbox" id="opt-damage" checked></label>
+      <div class="row"><span>皮肤图鉴</span>
+        <span class="row-inline"><button class="btn ghost small" id="btn-open-skins">伤害皮肤图鉴 · 641 款</button><button class="btn ghost small" id="btn-open-charskins">角色皮肤图鉴 · 111 款</button></span>
+      </div>
+      <label class="row"><span>画质</span>
+        <select id="opt-quality"><option value="high">高</option><option value="mid" selected>中</option><option value="low">低</option></select>
+      </label>
+      <label class="row"><span>视野（手机）</span>
+        <select id="opt-view"><option value="1">近 · 1.0x</option><option value="0.82" selected>标准 · 0.82x</option><option value="0.7">远 · 0.70x</option></select>
+      </label>
+      <label class="row"><span>屏幕方向</span>
+        <select id="opt-orient"><option value="portrait" selected>竖屏（默认）</option><option value="landscape">横屏</option><option value="auto">自动</option></select>
+      </label>
+      <button class="btn ghost" id="btn-reset-opts">恢复默认设置</button>
+      <button class="btn danger" id="btn-reset-save">清除存档</button>
+    </div>
+  </section>
+</div>
+
+<script src="js/assets.js?v=42"></script>
+  <script src="js/npcart.js?v=42"></script>
+  <script src="js/charskin.js?v=42"></script>
+  <script src="js/dmgskin.js?v=42"></script>
+  <script src="js/skillfx.js?v=42"></script>
+  <script src="js/atkfx.js?v=42"></script>
+<script src="js/data.js?v=42"></script>
+<script src="js/data2.js?v=42"></script>
+<script src="js/skinpack.js?v=42"></script>
+<script src="js/engine.js?v=42"></script>
+<script src="js/entities.js?v=42"></script>
+<script src="js/render.js?v=42"></script>
+<script src="js/ui.js?v=42"></script>
+<script src="js/game.js?v=42"></script>
+<script src="js/main.js?v=42"></script>
+</body>
+</html>
